@@ -1,0 +1,9 @@
+{
+  "name": "israel-quiz",
+  "version": "1.0.0",
+  "description": "Israel Geography Quiz",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

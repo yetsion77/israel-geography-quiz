@@ -96,6 +96,60 @@
             opacity: 1;
         }
 
+        /* עיצוב טופס השם */
+        .end-game-form {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group input {
+            padding: 8px;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Rubik', sans-serif;
+        }
+
+        /* עיצוב טבלת המצטיינים */
+        .leaderboard {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .leaderboard table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .leaderboard th, .leaderboard td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .leaderboard th {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        .leaderboard tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .leaderboard tr:hover {
+            background-color: #e9ecef;
+        }
+
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -119,6 +173,35 @@
         <div id="question"></div>
         <div id="options"></div>
         <div id="feedback" class="feedback"></div>
+        
+        <!-- טופס להזנת שם -->
+        <div id="name-form" style="display: none;" class="end-game-form">
+            <h2>כל הכבוד!</h2>
+            <p>הצלחת לענות נכון על <span id="final-score"></span> שאלות!</p>
+            <div class="form-group">
+                <label for="player-name">הכנס את שמך:</label>
+                <input type="text" id="player-name" maxlength="20" dir="rtl">
+                <button onclick="submitScore()">שמור תוצאה</button>
+            </div>
+        </div>
+
+        <!-- טבלת המצטיינים -->
+        <div id="leaderboard" style="display: none;" class="leaderboard">
+            <h2>טבלת המצטיינים</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>מקום</th>
+                        <th>שם</th>
+                        <th>ניקוד</th>
+                        <th>תאריך</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                </tbody>
+            </table>
+            <button onclick="startNewGame()">משחק חדש</button>
+        </div>
     </div>
     <script src="quiz.js"></script>
 </body>

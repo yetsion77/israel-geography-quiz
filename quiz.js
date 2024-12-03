@@ -128,14 +128,8 @@ function generateQuestion() {
 function loadQuestion() {
     // בדיקה אם המשחק הסתיים
     if (currentQuestion >= TOTAL_QUESTIONS) {
-        alert(`המשחק הסתיים! הצלחת לענות נכון על ${score} שאלות מתוך ${TOTAL_QUESTIONS}`);
-        if (confirm('האם תרצה להתחיל משחק חדש?')) {
-            currentQuestion = 0;
-            score = 0;
-            currentMode = 'north';
-        } else {
-            return;
-        }
+        showNameForm();
+        return;
     }
 
     const questionData = generateQuestion();
@@ -191,6 +185,71 @@ function checkAnswer(selectedCity, questionData) {
         currentMode = currentMode === 'north' ? 'east' : 'north';
         loadQuestion();
     }, 3000);
+}
+
+// פונקציה להצגת טופס השם בסיום המשחק
+function showNameForm() {
+    document.getElementById('final-score').textContent = score;
+    document.getElementById('name-form').style.display = 'block';
+    document.getElementById('options').style.display = 'none';
+    document.getElementById('question').style.display = 'none';
+}
+
+// פונקציה לשמירת התוצאה
+async function submitScore() {
+    const playerName = document.getElementById('player-name').value.trim();
+    if (!playerName) {
+        alert('נא להזין שם');
+        return;
+    }
+
+    const scoreData = {
+        name: playerName,
+        score: score,
+        date: new Date().toISOString()
+    };
+
+    try {
+        // שמירת התוצאה ב-localStorage
+        let scores = JSON.parse(localStorage.getItem('scores') || '[]');
+        scores.push(scoreData);
+        scores.sort((a, b) => b.score - a.score); // מיון לפי ניקוד
+        scores = scores.slice(0, 10); // שמירת 10 התוצאות הטובות ביותר
+        localStorage.setItem('scores', JSON.stringify(scores));
+        
+        showLeaderboard();
+    } catch (error) {
+        console.error('Error saving score:', error);
+        alert('אירעה שגיאה בשמירת התוצאה');
+    }
+}
+
+// פונקציה להצגת טבלת המצטיינים
+function showLeaderboard() {
+    const leaderboardBody = document.getElementById('leaderboard-body');
+    const scores = JSON.parse(localStorage.getItem('scores') || '[]');
+    
+    leaderboardBody.innerHTML = scores.map((score, index) => `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${score.name}</td>
+            <td>${score.score}</td>
+            <td>${new Date(score.date).toLocaleDateString('he-IL')}</td>
+        </tr>
+    `).join('');
+
+    document.getElementById('name-form').style.display = 'none';
+    document.getElementById('leaderboard').style.display = 'block';
+}
+
+// פונקציה להתחלת משחק חדש
+function startNewGame() {
+    score = 0;
+    currentQuestion = 0;
+    document.getElementById('leaderboard').style.display = 'none';
+    document.getElementById('options').style.display = 'block';
+    document.getElementById('question').style.display = 'block';
+    loadQuestion();
 }
 
 // התחל את המשחק כשהדף נטען

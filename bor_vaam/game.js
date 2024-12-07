@@ -1143,11 +1143,16 @@ const specialPlaces = [
     'אלון', 
     'בארי',
     'מעגן',
+'שלומי',
+'תלם',
     'חצב',
     'שני',
-   'אחיה',
+    'אחיה',
     'אורה',
     'מגדל',
+'להב',
+'אדם',
+    'חבר',
     'גבע'
 ];
 
@@ -1164,27 +1169,27 @@ function convertToGameFormat(place) {
 
 // המרה חזרה לפורמט תצוגה
 function convertToDisplayFormat(gamePlace) {
-    // מחפש את המקום המקורי שמתאים לפורמט המשחק
     return PLACES.find(place => convertToGameFormat(place) === gamePlace) || gamePlace;
 }
 
+// משתני המשחק
 let gamePlaces;        // רשימת המקומות בפורמט משחק
-let usedPlaces;        // מקומות שכבר היו במשחק
-let currentLetters = [];  // האותיות הנוכחיות בלוגיקה של המשחק
-let displayLetters = [];  // האותיות שמוצגות למשתמש
-let score;            // ניקוד השחקן
+let usedPlaces;        // מקומות שהיו בפועל במשחק
+let currentLetters;    // האותיות הנוכחיות
+let displayLetters;    // האותיות המוצגות
+let score;            // ניקוד
+let lastCompletedShortPlace = null;  // המקום הקצר האחרון שהושלם
 
 // אתחול המשחק
 function initGame() {
-    // הסרת כפילויות בעת יצירת רשימת המקומות למשחק
     gamePlaces = [...new Set(PLACES)].map(convertToGameFormat);
     usedPlaces = new Set();
-    currentLetters = [];  
-    displayLetters = [];  
+    currentLetters = [];
+    displayLetters = [];
     score = 0;
+    lastCompletedShortPlace = null;
     updateScore();
     
-    // בחירת אות ראשונה אקראית
     const firstLetter = gamePlaces[Math.floor(Math.random() * gamePlaces.length)][0];
     addLetter(firstLetter, 'computer');
 }
@@ -1195,14 +1200,12 @@ function addLetter(letter, source) {
     currentLetters.push(letterObj);
     displayLetters.push(letterObj);
     
-    // עדכון התצוגה - רק 5 אותיות אחרונות
     const lettersDiv = document.getElementById('letters');
     lettersDiv.innerHTML = '';
     
-    // לוקח את 5 האותיות האחרונות
-    const lastFiveLetters = displayLetters.slice(-5);
-    
-    lastFiveLetters.forEach(l => {
+    // הצגת 4 אותיות אחרונות בלבד
+    const lastFourLetters = displayLetters.slice(-4);
+    lastFourLetters.forEach(l => {
         const span = document.createElement('span');
         span.textContent = l.letter;
         span.className = l.source;
@@ -1210,81 +1213,88 @@ function addLetter(letter, source) {
     });
 }
 
-// עדכון תצוגת האותיות
-function updateLettersDisplay() {
-    const display = document.getElementById('letters-display');
-    display.innerHTML = '';
-    
-    // הצג רק את 5 האותיות האחרונות
-    const lettersToShow = currentLetters.slice(-5);
-    
-    lettersToShow.forEach(({ letter, source }) => {
-        const letterDiv = document.createElement('div');
-        letterDiv.className = `letter ${source}-letter`;
-        letterDiv.textContent = letter;
-        display.appendChild(letterDiv);
-    });
-}
-
-// בדיקה האם האות מתאימה למהלך
 function isValidLetter(letter) {
     if (!letter || letter.length !== 1) return false;
     
     const currentWord = currentLetters.map(l => l.letter).join('');
     
-    // אם אין מילה נוכחית, כל אות חוקית
-    if (currentWord === '') return true;
-    
-    // בודקים אם המילה הנוכחית היא מקום שלם
-    const isCompletePlace = gamePlaces.some(place => place === currentWord && !usedPlaces.has(place));
-    
-    // בודקים אם האות האחרונה היא מהמחשב
-    const lastLetter = currentLetters[currentLetters.length - 1];
-    const isLastLetterFromComputer = lastLetter && lastLetter.source === 'computer';
-    
-    // אם זה מקום מיוחד והאות האחרונה מהמחשב
-    if (isCompletePlace && specialPlaces.includes(currentWord) && isLastLetterFromComputer) {
-        // מאפשרים או להמשיך את המקום הארוך או להתחיל מקום חדש עם האות של המחשב
-        const lastComputerLetter = lastLetter.letter;
+    // אם אין מילה נוכחית, כל אות שיכולה להתחיל מקום היא תקינה
+    if (currentWord === '') {
         return gamePlaces.some(place => 
-            !usedPlaces.has(place) && (
-                // או להמשיך את המקום הארוך
-                place.startsWith(currentWord + letter) ||
-                // או להתחיל מקום חדש עם האות של המחשב
-                place.startsWith(lastComputerLetter + letter)
-            )
+            !usedPlaces.has(place) && 
+            place.startsWith(letter)
         );
     }
     
-    // אחרת, בודקים אם יש מקום שמתחיל במה שיש + האות החדשה
+    // אם יש מקום קצר שהושלם - לא משנה מה המחשב התכוון
+    // כל אות שיכולה או להתחיל מקום חדש או להמשיך את המקום הארוך היא תקינה
+    if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
+        const canStartNewPlace = gamePlaces.some(place => 
+            !usedPlaces.has(place) && 
+            place.startsWith(letter)
+        );
+        
+        const canContinueLongPlace = gamePlaces.some(place => 
+            !usedPlaces.has(place) && 
+            place.startsWith(currentWord + letter)
+        );
+        
+        return canStartNewPlace || canContinueLongPlace;
+    }
+    
+    // בדיקה רגילה למקומות שאינם מיוחדים
     return gamePlaces.some(place => 
         !usedPlaces.has(place) && 
         place.startsWith(currentWord + letter)
     );
 }
 
-// מציאת אות המחשב
 function findComputerLetter() {
     const currentWord = currentLetters.map(l => l.letter).join('');
     
-    // אם זה מקום מיוחד שיש לו המשך, תמיד נבחר להמשיך אותו
-    if (specialPlaces.includes(currentWord)) {
-        const longerPlaces = gamePlaces.filter(place => 
-            !usedPlaces.has(place) && 
-            place.startsWith(currentWord) && 
-            place.length > currentWord.length
-        );
+    // אם הושלם מקום קצר
+    if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
+        const possibleMoves = [];
         
-        if (longerPlaces.length > 0) {
-            const randomPlace = longerPlaces[Math.floor(Math.random() * longerPlaces.length)];
-            return {
-                letter: randomPlace[currentWord.length],
-                source: 'computer'
-            };
+        // אפשרות 1: המשך למקום ארוך
+        gamePlaces.forEach(place => {
+            if (!usedPlaces.has(place) && 
+                place.startsWith(currentWord) && 
+                place.length > currentWord.length) {
+                possibleMoves.push({
+                    letter: place[currentWord.length],
+                    source: 'computer',
+                    type: 'continue'
+                });
+            }
+        });
+        
+        // אפשרות 2: התחלת מקום חדש
+        gamePlaces.forEach(place => {
+            if (!usedPlaces.has(place)) {
+                possibleMoves.push({
+                    letter: place[0],
+                    source: 'computer',
+                    type: 'new'
+                });
+            }
+        });
+        
+        // בחירה אקראית מבין האפשרויות
+        if (possibleMoves.length > 0) {
+            const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            if (move.type === 'new') {
+                // אם מתחילים מקום חדש, מוסיפים את המקום הקצר לרשימה
+                usedPlaces.add(currentWord);
+                currentLetters = [];
+                lastCompletedShortPlace = null;
+            }
+            return move;
         }
+        return null;
     }
     
-    // מציאת כל המקומות האפשריים שמתחילים במילה הנוכחית
+    // חיפוש רגיל
     const possiblePlaces = gamePlaces.filter(place => 
         !usedPlaces.has(place) && 
         place.startsWith(currentWord) && 
@@ -1293,7 +1303,6 @@ function findComputerLetter() {
     
     if (possiblePlaces.length === 0) return null;
     
-    // בחירה אקראית של מקום מהאפשריים
     const randomPlace = possiblePlaces[Math.floor(Math.random() * possiblePlaces.length)];
     return {
         letter: randomPlace[currentWord.length],
@@ -1301,41 +1310,64 @@ function findComputerLetter() {
     };
 }
 
-// בדיקה האם הושלם מקום
-function checkCompletedPlace() {
+function handleCompletedPlace() {
     const currentWord = currentLetters.map(l => l.letter).join('');
-    let completedPlace = null;
     
-    // בדיקה האם יש מקום שהושלם
-    for (const place of gamePlaces) {
-        if (!usedPlaces.has(place) && place === currentWord) {
-            completedPlace = place;
-            break;
+    if (gamePlaces.includes(currentWord) && !usedPlaces.has(currentWord)) {
+        if (specialPlaces.includes(currentWord)) {
+            lastCompletedShortPlace = currentWord;
+            return true;
+        } else {
+            usedPlaces.add(currentWord);
+            currentLetters = [];
+            lastCompletedShortPlace = null;
+            return true;
         }
     }
-    
-    if (completedPlace) {
-        // אם זה מקום מיוחד, לא נסמן אותו כבשימוש עדיין
-        if (specialPlaces.includes(completedPlace)) {
-            return false;
-        }
-        
-        // אם זה מקום רגיל, מסמנים אותו כבשימוש
-        usedPlaces.add(completedPlace);
-        currentLetters = [];
-        return true;
-    }
-    
     return false;
 }
 
-// מציאת אות התחלה חדשה
-function findNewStartingLetter() {
-    const availablePlaces = gamePlaces.filter(place => !usedPlaces.has(place));
-    if (availablePlaces.length === 0) return null;
+function submitLetter() {
+    const input = document.getElementById('letter-input');
+    const letter = input.value.trim();
+    input.value = '';
     
-    const randomPlace = availablePlaces[Math.floor(Math.random() * availablePlaces.length)];
-    return randomPlace[0];
+    if (!letter) return;
+    
+    if (isValidLetter(letter)) {
+        const currentWord = currentLetters.map(l => l.letter).join('');
+        
+        // אם מתחילים מקום חדש אחרי מקום קצר
+        if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
+            const startingNewPlace = gamePlaces.some(place => 
+                !usedPlaces.has(place) && 
+                place.startsWith(letter)
+            );
+            
+            if (startingNewPlace) {
+                usedPlaces.add(currentWord);
+                currentLetters = [];
+                lastCompletedShortPlace = null;
+            }
+        }
+        
+        addLetter(letter, 'player');
+        score++;
+        updateScore();
+        
+        const completedPlace = handleCompletedPlace();
+        
+        // תור המחשב
+        const computerLetter = findComputerLetter();
+        if (computerLetter) {
+            addLetter(computerLetter.letter, 'computer');
+            handleCompletedPlace();
+        } else {
+            endGame("no_continuation");
+        }
+    } else {
+        endGame("invalid_letter");
+    }
 }
 
 // עדכון הניקוד
@@ -1343,42 +1375,20 @@ function updateScore() {
     document.getElementById('score').textContent = `ניקוד: ${score}`;
 }
 
-// מציאת כל האותיות האפשריות למהלך
-function findPossibleLetters() {
-    const currentWord = currentLetters.map(l => l.letter).join('');
-    const possibleLetters = new Set();
-    
-    // מציאת כל האותיות האפשריות להמשך
-    gamePlaces.forEach(place => {
-        if (!usedPlaces.has(place) && place.startsWith(currentWord) && currentWord.length < place.length) {
-            const nextLetter = place[currentWord.length];
-            if (nextLetter) possibleLetters.add(nextLetter);
-        }
-    });
-    
-    return Array.from(possibleLetters);
-}
+// מאזין לקלט המשתמש
+document.getElementById('letter-input').addEventListener('input', function(e) {
+    const letter = e.target.value.trim();
+    if (letter) {
+        submitLetter();
+    }
+});
 
-// מציאת מקומות אפשריים להמשך
-function findPossiblePlaces() {
-    const currentWord = currentLetters.map(l => l.letter).join('');
-    const possiblePlaces = [];
-    
-    gamePlaces.forEach(place => {
-        if (!usedPlaces.has(place) && place.startsWith(currentWord) && currentWord.length < place.length) {
-            possiblePlaces.push(place);
-        }
-    });
-    
-    return possiblePlaces;
-}
-
-// פונקציה לסיום המשחק
+// סיום המשחק
 function endGame(reason) {
     document.getElementById('game-over').style.display = 'block';
     const gameOverText = document.getElementById('game-over-text');
     
-    // הצגת המקומות שהיו במשחק
+    // הצגת המקומות שהיו בפועל במשחק
     const usedPlacesList = Array.from(usedPlaces)
         .map(place => convertToDisplayFormat(place))
         .join(', ');
@@ -1389,37 +1399,36 @@ function endGame(reason) {
     
     if (reason === "invalid_letter") {
         message += `האות האחרונה שהקלדת לא מתאימה.<br>`;
-        const possiblePlaces = findPossiblePlaces();
-        if (possiblePlaces.length > 0) {
-            // הסרת כפילויות מהרשימה
-            const uniquePlaces = [...new Set(possiblePlaces)];
-            const displayPlaces = uniquePlaces.map(place => convertToDisplayFormat(place));
-            message += `היה אפשר להמשיך למקומות: ${displayPlaces.join(', ')}`;
+        
+        // הצגת האפשרויות הרלוונטיות בהתאם למצב
+        if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
+            const longerPlaces = gamePlaces.filter(place => 
+                !usedPlaces.has(place) && 
+                place.startsWith(currentWord)
+            ).map(convertToDisplayFormat);
+            
+            const newPlaces = gamePlaces.filter(place => 
+                !usedPlaces.has(place)
+            ).map(convertToDisplayFormat);
+            
+            if (longerPlaces.length > 0) {
+                message += `ניתן היה להמשיך ל: ${longerPlaces.join(', ')}<br>`;
+            }
+            if (newPlaces.length > 0) {
+                message += `או להתחיל מקום חדש`;
+            }
+        } else {
+            const possiblePlaces = gamePlaces.filter(place => 
+                !usedPlaces.has(place) && 
+                place.startsWith(currentWord)
+            ).map(convertToDisplayFormat);
+            
+            if (possiblePlaces.length > 0) {
+                message += `ניתן היה להמשיך ל: ${possiblePlaces.join(', ')}`;
+            }
         }
     } else if (reason === "no_continuation") {
-        message += `לא נמצא המשך למילה "${convertToDisplayFormat(currentWord)}".<br>`;
-        const possibleLetters = findPossibleLetters();
-        if (possibleLetters.length > 0) {
-            const possibleContinuations = new Map(); // שימוש ב-Map למניעת כפילויות
-            for (const letter of possibleLetters) {
-                const testWord = currentWord + letter;
-                const matchingPlaces = gamePlaces.filter(place => 
-                    !usedPlaces.has(place) && 
-                    place.startsWith(testWord)
-                );
-                if (matchingPlaces.length > 0) {
-                    possibleContinuations.set(letter, matchingPlaces.map(p => convertToDisplayFormat(p)));
-                }
-            }
-            if (possibleContinuations.size > 0) {
-                message += `היה אפשר להמשיך עם:<br>`;
-                for (const [letter, places] of possibleContinuations) {
-                    // הסרת כפילויות מרשימת המקומות
-                    const uniquePlaces = [...new Set(places)];
-                    message += `האות "${letter}" למקומות: ${uniquePlaces.join(', ')}<br>`;
-                }
-            }
-        }
+        message += `לא נמצא המשך אפשרי למילה הנוכחית.`;
     }
     
     gameOverText.innerHTML = message;
@@ -1432,43 +1441,6 @@ function startNewGame() {
     document.getElementById('letter-input').disabled = false;
     document.getElementById('letters').innerHTML = '';
     initGame();
-}
-
-// מאזין ללחיצה על Enter
-document.getElementById('letter-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        submitLetter();
-    }
-});
-
-// טיפול בהגשת אות
-function submitLetter() {
-    const input = document.getElementById('letter-input');
-    const letter = input.value.trim();
-    input.value = '';
-    
-    if (!letter) return;
-    
-    if (isValidLetter(letter)) {
-        addLetter(letter, 'player');
-        score++;
-        updateScore();
-        
-        const completedPlace = checkCompletedPlace();
-        
-        // תור המחשב
-        const computerLetter = findComputerLetter();
-        if (computerLetter) {
-            addLetter(computerLetter.letter, 'computer');
-            checkCompletedPlace();
-        } else if (!completedPlace) {  // מסיימים רק אם לא הושלם מקום
-            // המחשב לא מצא המשך - סיום המשחק
-            endGame("no_continuation");
-        }
-    } else {
-        // האות לא תקינה - סיום המשחק
-        endGame("invalid_letter");
-    }
 }
 
 // התחלת המשחק

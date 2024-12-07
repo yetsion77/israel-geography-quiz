@@ -1151,8 +1151,7 @@ const specialPlaces = [
     'אורה',
     'מגדל',
 'להב',
-'אדם',
-    'חבר',
+'חבר',
     'גבע'
 ];
 
@@ -1218,28 +1217,30 @@ function isValidLetter(letter) {
     
     const currentWord = currentLetters.map(l => l.letter).join('');
     
-    // אם אין מילה נוכחית, כל אות שיכולה להתחיל מקום היא תקינה
-    if (currentWord === '') {
-        return gamePlaces.some(place => 
-            !usedPlaces.has(place) && 
-            place.startsWith(letter)
-        );
-    }
-    
-    // אם יש מקום קצר שהושלם - לא משנה מה המחשב התכוון
-    // כל אות שיכולה או להתחיל מקום חדש או להמשיך את המקום הארוך היא תקינה
-    if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
+    // אם אין מילה נוכחית
+    if (currentWord === '') return true;
+
+    // בודקים אם המילה מכילה מקום קצר מתוך הרשימה המיוחדת
+    // למשל אם currentWord הוא 'אלוני', נבדוק אם 'אלון' נמצא ברשימה המיוחדת
+    const hasShortPlace = specialPlaces.some(place => {
+        const gameFormatPlace = convertToGameFormat(place);
+        return currentWord.startsWith(gameFormatPlace) && gamePlaces.includes(gameFormatPlace);
+    });
+
+    if (hasShortPlace) {
+        // או שאפשר להתחיל מקום חדש
         const canStartNewPlace = gamePlaces.some(place => 
             !usedPlaces.has(place) && 
             place.startsWith(letter)
         );
         
-        const canContinueLongPlace = gamePlaces.some(place => 
+        // או שאפשר להמשיך את המקום הנוכחי
+        const canContinueCurrent = gamePlaces.some(place => 
             !usedPlaces.has(place) && 
             place.startsWith(currentWord + letter)
         );
         
-        return canStartNewPlace || canContinueLongPlace;
+        return canStartNewPlace || canContinueCurrent;
     }
     
     // בדיקה רגילה למקומות שאינם מיוחדים

@@ -6,98 +6,134 @@
     <title>בור ועם הארץ</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #4CAF50;
+            --error-color: #f44336;
+            --background-color: #f0f8ff;
+            --card-background: white;
+            --border-color: #ddd;
+        }
+
         body {
             font-family: 'Rubik', sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f0f8ff;
+            background-color: var(--background-color);
             direction: rtl;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
         #game-container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: white;
+            background-color: var(--card-background);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            border: 2px solid var(--border-color);
         }
+
         h1 {
-            color: #0066cc;
+            color: var(--primary-color);
             text-align: center;
             margin-bottom: 30px;
+            font-size: 2rem;
         }
+
         #letters {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             justify-content: center;
             margin: 20px 0;
             padding: 15px;
             background-color: #f8f9fa;
             border-radius: 8px;
             min-height: 60px;
+            border: 1px solid var(--border-color);
         }
+
         #letters span {
             display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
+            width: 45px;
+            height: 45px;
+            line-height: 45px;
             text-align: center;
-            margin: 0 5px;
             border-radius: 5px;
             font-size: 24px;
             font-weight: bold;
+            border: 2px solid;
+            transition: all 0.3s ease;
         }
+
         #letters span.player {
-            background-color: #4CAF50;
+            background-color: var(--secondary-color);
             color: white;
+            border-color: #45a049;
         }
+
         #letters span.computer {
-            background-color: #f44336;
+            background-color: var(--error-color);
             color: white;
+            border-color: #d32f2f;
         }
+
         #input-section {
             text-align: center;
             margin: 20px 0;
         }
+
         #letter-input {
             font-size: 20px;
             padding: 10px;
             width: 50px;
             text-align: center;
-            border: 2px solid #0066cc;
+            border: 2px solid var(--primary-color);
             border-radius: 5px;
             font-family: 'Rubik', sans-serif;
         }
-        button {
+
+        #virtual-keyboard {
+            display: none;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .key {
+            padding: 15px 20px;
+            background-color: #e9ecef;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-family: 'Rubik', sans-serif;
             font-size: 18px;
-            padding: 10px 20px;
-            margin: 0 10px;
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
             cursor: pointer;
-            font-family: 'Rubik', sans-serif;
+            transition: all 0.2s ease;
         }
-        button:hover {
-            background-color: #0052a3;
+
+        .key:hover {
+            background-color: #dee2e6;
         }
+
         #score {
             text-align: center;
-            font-size: 20px;
-            color: #0066cc;
+            font-size: 24px;
+            color: var(--primary-color);
             margin: 20px 0;
+            font-weight: bold;
         }
-        #game-over {
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background-color: #f8d7da;
-            border-radius: 8px;
-            color: #721c24;
-            display: none;
-        }
+
         .instructions {
             text-align: right;
             margin: 20px 0;
@@ -106,37 +142,166 @@
             border-radius: 8px;
             font-size: 16px;
             line-height: 1.5;
+            border: 1px solid var(--border-color);
+        }
+
+        #game-over {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8d7da;
+            border-radius: 8px;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        #high-scores {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .high-score-entry {
+            display: grid;
+            grid-template-columns: 40px 2fr 1fr 1fr;
+            gap: 10px;
+            padding: 12px;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .high-score-entry:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .score-rank {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .score-name {
+            font-weight: 500;
+        }
+
+        .score-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .score-points {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            #letter-input {
+                display: none;
+            }
+
+            #virtual-keyboard {
+                display: block;
+            }
+        }
+
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Rubik', sans-serif;
+        }
+
+        button:hover {
+            background-color: #0052a3;
+        }
+
+        #name-input-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        #name-input {
+            font-size: 18px;
+            padding: 10px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: 'Rubik', sans-serif;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <h1>בור ועם הארץ - משחק מקומות</h1>
+        <h1>בור ועם הארץ בידיעת הארץ</h1>
         <div class="instructions">
-            <h3>הוראות המשחק:</h3>
-            <ul>
-                <li>המשחק מתחיל עם אות מהמחשב (באדום)</li>
-                <li>הקלד אות (בירוק) שיכולה להיות חלק משם של יישוב</li>
-                <li>המחשב ימשיך עם אות נוספת, וכך הלאה</li>
-                <li>כשמושלם שם של יישוב קצר (למשל "גבע"), יש שתי אפשרויות:
-                    <ul>
-                        <li>להמשיך ליישוב ארוך יותר (כמו "גבעת אבני")</li>
-                        <li>להתחיל יישוב חדש מהאות האחרונה</li>
-                    </ul>
-                </li>
-                <li>המשחק נגמר כשאין אפשרות להמשיך או כשנכתבת אות לא חוקית</li>
-            </ul>
+            <p>אז איך אתם בידיעת הארץ? מצאו כמה שיותר שמות מקומות בארץ ישראל</p>
+            <p>המשחק הולך כך: המחשב נותן אות ראשונה של אחד המקומות בארץ, אתם צריכים להקליד אות שממשיכה את שם היישוב.</p>
+            <p>כאשר מסתיים שם יישוב - עוברים מיד למקום הבא, בלי הודעה כלשהי. במשחק אין רווחים ואין אותיות סופיות. בהצלחה, צאו לדרך!</p>
+            
         </div>
         <div id="score">ניקוד: 0</div>
         <div id="letters"></div>
         <div id="input-section">
             <input type="text" id="letter-input" maxlength="1" placeholder="אות" dir="rtl">
         </div>
+        <div id="virtual-keyboard">
+            <!-- המקלדת הווירטואלית תיווצר על ידי JavaScript -->
+        </div>
         <div id="game-over">
             <p id="game-over-text"></p>
+            <div id="name-input-container">
+                <input type="text" id="name-input" placeholder="הכניסו את שמכם" maxlength="20">
+                <button onclick="saveScore()">שמירת תוצאה</button>
+            </div>
             <button onclick="startNewGame()">משחק חדש</button>
         </div>
+        <div id="high-scores">
+            <h2>טבלת שיאים</h2>
+            <div id="high-scores-list"></div>
+        </div>
     </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
+        from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuBvkaPlk5c5TaRLjXlGJU8CzjPhp59vg",
+            authDomain: "boor-a77ba.firebaseapp.com",
+            databaseURL: "https://boor-a77ba-default-rtdb.firebaseio.com",
+            projectId: "boor-a77ba",
+            storageBucket: "boor-a77ba.firebasestorage.app",
+            messagingSenderId: "833492383808",
+            appId: "1:833492383808:web:e56b92acf690bf1a8dc7a5",
+            measurementId: "G-8W8FD8S6QS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const analytics = getAnalytics(app);
+
+        // הפוך את המשתנים לגלובליים
+        window.firebaseApp = app;
+        window.firebaseDB = database;
+        window.dbRef = ref;
+        window.dbPush = push;
+        window.dbQuery = query;
+        window.dbOrderByChild = orderByChild;
+        window.dbLimitToLast = limitToLast;
+        window.dbOnValue = onValue;
+    </script>
     <script src="game.js"></script>
 </body>
 </html>

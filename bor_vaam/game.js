@@ -59,6 +59,7 @@ const PLACES = [
     "איתן",
     "אלומה",
     "אלומות",
+"אלון",
     "אלון הגליל",
     "אלון מורה",
     "אלון שבות",
@@ -415,6 +416,7 @@ const PLACES = [
     "טל אל",
     "טללים",
     "טלמון",
+"טל מנשה",
     "טנא",
     "טפחות",
 
@@ -612,7 +614,7 @@ const PLACES = [
     "מודיעין",
     "מודיעין עילית",
     "מולדת",
-    "מוצא עילית",
+    "מוצא",
     "מורן",
     "מורשת",
     "מזור",
@@ -631,7 +633,7 @@ const PLACES = [
     "מירון",
     "מישר",
     "מיתר",
-    "מכבים-רעות",
+    "מכבים רעות",
     "מכורה",
     "מכמורת",
     "מכמנים",
@@ -662,6 +664,7 @@ const PLACES = [
     "מעלה גלבוע",
     "מעלה גמלא",
     "מעלה החמישה",
+"מעלה חבר",
     "מעלה לבונה",
     "מעלה מכמש",
     "מעלה עירון",
@@ -751,7 +754,6 @@ const PLACES = [
     "נחליאל",
     "נחלים",
     "נחם",
-    "נחף",
     "נחשולים",
     "נחשון",
     "נחשונים",
@@ -1134,28 +1136,61 @@ const PLACES = [
     "תרום",
 ];
 
+// [כאן תהיה רשימת היישובים - PLACES]
 // רשימת מקומות מיוחדים שיש להם המשך
 const specialPlaces = [
     'בית אל', 
     'רמות', 
     'מצפה', 
     'נווה', 
-    'אלון', 
+    'אלון',
     'בארי',
     'מעגן',
-'שלומי',
-'תלם',
     'חצב',
     'שני',
     'אחיה',
+'להב',
     'אורה',
     'מגדל',
-'להב',
-'חבר',
-    'גבע'
+    'גבע',
+'מתת',
+'נטע',
+'תלם', 
+    'שלומי'
 ];
 
-// המרת שמות המקומות לפורמט המשחק (ללא רווחים)
+// מיפוי מקומות קצרים למקומות ארוכים
+const longPlacesMap = {
+    'בית אל': ['בית אלעזרי', 'בית אלפא'],
+    'רמות': ['רמות השבים', 'רמות מאיר', 'רמות מנשה', 'רמות נפתלי'],
+    'מצפה': ['מצפה רמון', 'מצפה יריחו', 'מצפה נטופה', 'מצפה שלם'],
+    'נווה': ['נווה אילן', 'נווה איתן', 'נווה ים', 'נווה ימין', 'נווה ירק', 'נווה מבטח', 'נווה מיכאל'],
+    'אלון': ['אלון הגליל', 'אלון מורה', 'אלון שבות', 'אלוני אבא', 'אלוני הבשן', 'אלוני יצחק', 'אלונים'],
+    'בארי': ['באר יעקב'],
+'נטע': ['נטעים'],
+    'מעגן': ['מעגן מיכאל'],
+'תלם': ['תלמים', 'תלמי אליהו', 'תלמי אלעזר', 'תלמי בילו', 'תלמי יוסף', 'תלמי יחיאל', 'תלמי יפה'],
+'להב': ['להבים'],
+    'חצב': ['חצבה'],
+    'שני': ['שניר'],
+    'אחיה': ['אחיהוד'],
+    'אורה': ['אור הנר'],
+'מתת': ['מתתיהו'],
+    'מגדל': ['מגדל העמק', 'מגדל עוז', 'מגדלים'],
+    'גבע': ['גבעת אבני', 'גבעת אלה', 'גבעת ברנר', 'גבעת זאב', 'גבעת חן', 'גבעת עדה', 'גבעת עוז'],
+    'שלומי': ['שלומית']
+};
+
+// יש להוסיף כאן את רשימת PLACES
+// משתני המשחק
+let gamePlaces;        // רשימת המקומות בפורמט משחק
+let usedPlaces;        // מקומות שהיו בפועל במשחק
+let currentLetters;    // האותיות הנוכחיות
+let displayLetters;    // האותיות המוצגות
+let score;             // ניקוד
+let computerCompletedShortPlace = null;  // מקום קצר שהמחשב השלים
+
+// המרת שמות המקומות לפורמט המשחק
 function convertToGameFormat(place) {
     return place
         .replace(/ך/g, 'כ')
@@ -1171,29 +1206,106 @@ function convertToDisplayFormat(gamePlace) {
     return PLACES.find(place => convertToGameFormat(place) === gamePlace) || gamePlace;
 }
 
-// משתני המשחק
-let gamePlaces;        // רשימת המקומות בפורמט משחק
-let usedPlaces;        // מקומות שהיו בפועל במשחק
-let currentLetters;    // האותיות הנוכחיות
-let displayLetters;    // האותיות המוצגות
-let score;            // ניקוד
-let lastCompletedShortPlace = null;  // המקום הקצר האחרון שהושלם
+function createVirtualKeyboard() {
+    const keyboard = document.getElementById('virtual-keyboard');
+    const rows = [
+        ['ק', 'ר', 'א', 'ט', 'ו', 'פ'],
+        ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח'],
+        ['ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ'],
+        ['ת', 'ל', 'י']
+    ];
 
-// אתחול המשחק
+    rows.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'keyboard-row';
+        
+        row.forEach(letter => {
+            const button = document.createElement('button');
+            button.className = 'key';
+            button.textContent = letter;
+            button.onclick = () => handleVirtualKeyPress(letter);
+            rowDiv.appendChild(button);
+        });
+        
+        keyboard.appendChild(rowDiv);
+    });
+}
+
+async function handleVirtualKeyPress(letter) {
+    if (!document.getElementById('letter-input').disabled) {
+        document.getElementById('letter-input').value = letter;
+        await submitLetter();
+    }
+}
+
+async function getHighScores() {
+    return new Promise((resolve) => {
+        const scoresRef = window.dbRef(window.firebaseDB, 'highScores');
+        const scoresQuery = window.dbQuery(
+            scoresRef,
+            window.dbOrderByChild('score'),
+            window.dbLimitToLast(10)
+        );
+
+        window.dbOnValue(scoresQuery, (snapshot) => {
+            const scores = [];
+            snapshot.forEach((childSnapshot) => {
+                scores.push(childSnapshot.val());
+            });
+            resolve(scores.reverse());
+        });
+    });
+}
+
+async function saveScore() {
+    const name = document.getElementById('name-input').value.trim();
+    if (!name) return;
+
+    const newScore = {
+        name,
+        score,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('he-IL')
+    };
+
+    const scoresRef = window.dbRef(window.firebaseDB, 'highScores');
+    await window.dbPush(scoresRef, newScore);
+    
+    document.getElementById('name-input-container').style.display = 'none';
+    updateHighScoresDisplay();
+}
+
+async function updateHighScoresDisplay() {
+    const highScores = await getHighScores();
+    const container = document.getElementById('high-scores-list');
+    container.innerHTML = '';
+
+    highScores.forEach((entry, index) => {
+        const div = document.createElement('div');
+        div.className = 'high-score-entry';
+        div.innerHTML = `
+            <span class="score-rank">${index + 1}.</span>
+            <span class="score-name">${entry.name}</span>
+            <span class="score-points">${entry.score} נקודות</span>
+            <span class="score-date">${entry.date}</span>
+        `;
+        container.appendChild(div);
+    });
+}
+
 function initGame() {
     gamePlaces = [...new Set(PLACES)].map(convertToGameFormat);
     usedPlaces = new Set();
     currentLetters = [];
     displayLetters = [];
     score = 0;
-    lastCompletedShortPlace = null;
+    computerCompletedShortPlace = null;
     updateScore();
     
     const firstLetter = gamePlaces[Math.floor(Math.random() * gamePlaces.length)][0];
     addLetter(firstLetter, 'computer');
 }
 
-// הוספת אות למשחק
 function addLetter(letter, source) {
     const letterObj = { letter, source };
     currentLetters.push(letterObj);
@@ -1202,7 +1314,6 @@ function addLetter(letter, source) {
     const lettersDiv = document.getElementById('letters');
     lettersDiv.innerHTML = '';
     
-    // הצגת 4 אותיות אחרונות בלבד
     const lastFourLetters = displayLetters.slice(-4);
     lastFourLetters.forEach(l => {
         const span = document.createElement('span');
@@ -1212,87 +1323,74 @@ function addLetter(letter, source) {
     });
 }
 
-function isValidLetter(letter) {
-    if (!letter || letter.length !== 1) return false;
-    
-    const currentWord = currentLetters.map(l => l.letter).join('');
-    
-    // אם אין מילה נוכחית
-    if (currentWord === '') return true;
-
-    // בודקים אם המילה מכילה מקום קצר מתוך הרשימה המיוחדת
-    // למשל אם currentWord הוא 'אלוני', נבדוק אם 'אלון' נמצא ברשימה המיוחדת
-    const hasShortPlace = specialPlaces.some(place => {
-        const gameFormatPlace = convertToGameFormat(place);
-        return currentWord.startsWith(gameFormatPlace) && gamePlaces.includes(gameFormatPlace);
-    });
-
-    if (hasShortPlace) {
-        // או שאפשר להתחיל מקום חדש
-        const canStartNewPlace = gamePlaces.some(place => 
-            !usedPlaces.has(place) && 
-            place.startsWith(letter)
-        );
-        
-        // או שאפשר להמשיך את המקום הנוכחי
-        const canContinueCurrent = gamePlaces.some(place => 
-            !usedPlaces.has(place) && 
-            place.startsWith(currentWord + letter)
-        );
-        
-        return canStartNewPlace || canContinueCurrent;
-    }
-    
-    // בדיקה רגילה למקומות שאינם מיוחדים
-    return gamePlaces.some(place => 
-        !usedPlaces.has(place) && 
-        place.startsWith(currentWord + letter)
-    );
-}
-
 function findComputerLetter() {
     const currentWord = currentLetters.map(l => l.letter).join('');
     
-    // אם הושלם מקום קצר
-    if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
-        const possibleMoves = [];
+    // אם המשתמש זה עתה השלים מקום קצר
+    if (specialPlaces.includes(currentWord) && !usedPlaces.has(currentWord)) {
+        // מחפשים מקום חדש לגמרי
+        const possibleNewPlaces = [];
         
-        // אפשרות 1: המשך למקום ארוך
-        gamePlaces.forEach(place => {
-            if (!usedPlaces.has(place) && 
-                place.startsWith(currentWord) && 
-                place.length > currentWord.length) {
-                possibleMoves.push({
-                    letter: place[currentWord.length],
-                    source: 'computer',
-                    type: 'continue'
-                });
-            }
-        });
-        
-        // אפשרות 2: התחלת מקום חדש
-        gamePlaces.forEach(place => {
+        // עוברים על כל המקומות האפשריים
+        for (const place of gamePlaces) {
             if (!usedPlaces.has(place)) {
-                possibleMoves.push({
-                    letter: place[0],
-                    source: 'computer',
-                    type: 'new'
+                const firstLetter = place[0];
+                
+                // בודקים האם יש מקום ארוך שמתחיל באות הזו
+                const isLetterUsedInLongPlace = longPlacesMap[currentWord].some(longPlace => {
+                    const longPlaceFormatted = convertToGameFormat(longPlace);
+                    return longPlaceFormatted.startsWith(currentWord + firstLetter);
                 });
+                
+                // אם האות לא משמשת באף מקום ארוך, היא בטוחה לשימוש
+                if (!isLetterUsedInLongPlace) {
+                    possibleNewPlaces.push(place);
+                }
             }
-        });
-        
-        // בחירה אקראית מבין האפשרויות
-        if (possibleMoves.length > 0) {
-            const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-            if (move.type === 'new') {
-                // אם מתחילים מקום חדש, מוסיפים את המקום הקצר לרשימה
-                usedPlaces.add(currentWord);
-                currentLetters = [];
-                lastCompletedShortPlace = null;
-            }
-            return move;
         }
-        return null;
+        
+        if (possibleNewPlaces.length > 0) {
+            const randomPlace = possibleNewPlaces[Math.floor(Math.random() * possibleNewPlaces.length)];
+            usedPlaces.add(currentWord);
+            currentLetters = [];
+            return {
+                letter: randomPlace[0],
+                source: 'computer'
+            };
+        }
+    }
+    
+    // אם המחשב השלים מקום קצר והמשתמש נתן אות
+    if (computerCompletedShortPlace && currentWord.length === 1) {
+        const possibleSecondLetters = new Set();
+        
+        // עוברים על כל המקומות שמתחילים באות של המשתמש
+        for (const place of gamePlaces) {
+            if (!usedPlaces.has(place) && place.startsWith(currentWord)) {
+                const secondLetter = place[1];
+                if (!secondLetter) continue;
+                
+                // בודקים שהאות השנייה לא יכולה להיות המשך של המקום הקצר
+                const cannotBeContinuation = !longPlacesMap[computerCompletedShortPlace].some(longPlace => 
+                    convertToGameFormat(longPlace).startsWith(computerCompletedShortPlace + currentWord + secondLetter)
+                );
+                
+                if (cannotBeContinuation) {
+                    possibleSecondLetters.add(secondLetter);
+                }
+            }
+        }
+        
+        if (possibleSecondLetters.size > 0) {
+            const letters = Array.from(possibleSecondLetters);
+            const randomLetter = letters[Math.floor(Math.random() * letters.length)];
+            usedPlaces.add(computerCompletedShortPlace);
+            computerCompletedShortPlace = null;
+            return {
+                letter: randomLetter,
+                source: 'computer'
+            };
+        }
     }
     
     // חיפוש רגיל
@@ -1311,24 +1409,61 @@ function findComputerLetter() {
     };
 }
 
-function handleCompletedPlace() {
+function isValidLetter(letter) {
+    if (!letter || letter.length !== 1) return false;
+    
+    const currentWord = currentLetters.map(l => l.letter).join('');
+    
+    if (currentWord === '') {
+        return gamePlaces.some(place => 
+            !usedPlaces.has(place) && 
+            place.startsWith(letter)
+        );
+    }
+
+    // אם יש מקום קצר שהמחשב השלים
+    if (computerCompletedShortPlace) {
+        return (
+            // או שמתאים להמשך המקום הארוך
+            gamePlaces.some(place => 
+                !usedPlaces.has(place) && 
+                place.startsWith(currentWord + letter)
+            ) ||
+            // או שמתאים למקום חדש
+            gamePlaces.some(place => 
+                !usedPlaces.has(place) && 
+                place.startsWith(letter)
+            )
+        );
+    }
+
+    // בדיקה רגילה
+    return gamePlaces.some(place => 
+        !usedPlaces.has(place) && 
+        place.startsWith(currentWord + letter)
+    );
+}
+
+function handleCompletedPlace(byComputer = false) {
     const currentWord = currentLetters.map(l => l.letter).join('');
     
     if (gamePlaces.includes(currentWord) && !usedPlaces.has(currentWord)) {
         if (specialPlaces.includes(currentWord)) {
-            lastCompletedShortPlace = currentWord;
+            if (byComputer) {
+                computerCompletedShortPlace = currentWord;
+            }
             return true;
         } else {
             usedPlaces.add(currentWord);
             currentLetters = [];
-            lastCompletedShortPlace = null;
+            computerCompletedShortPlace = null;
             return true;
         }
     }
     return false;
 }
 
-function submitLetter() {
+async function submitLetter() {
     const input = document.getElementById('letter-input');
     const letter = input.value.trim();
     input.value = '';
@@ -1336,33 +1471,19 @@ function submitLetter() {
     if (!letter) return;
     
     if (isValidLetter(letter)) {
-        const currentWord = currentLetters.map(l => l.letter).join('');
-        
-        // אם מתחילים מקום חדש אחרי מקום קצר
-        if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
-            const startingNewPlace = gamePlaces.some(place => 
-                !usedPlaces.has(place) && 
-                place.startsWith(letter)
-            );
-            
-            if (startingNewPlace) {
-                usedPlaces.add(currentWord);
-                currentLetters = [];
-                lastCompletedShortPlace = null;
-            }
-        }
-        
         addLetter(letter, 'player');
         score++;
         updateScore();
         
-        const completedPlace = handleCompletedPlace();
+        const completedPlace = handleCompletedPlace(false);
         
-        // תור המחשב
+        // הוספת השהיה של 300 מילישניות
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
         const computerLetter = findComputerLetter();
         if (computerLetter) {
             addLetter(computerLetter.letter, 'computer');
-            handleCompletedPlace();
+            handleCompletedPlace(true);
         } else {
             endGame("no_continuation");
         }
@@ -1371,25 +1492,21 @@ function submitLetter() {
     }
 }
 
-// עדכון הניקוד
 function updateScore() {
     document.getElementById('score').textContent = `ניקוד: ${score}`;
 }
 
-// מאזין לקלט המשתמש
-document.getElementById('letter-input').addEventListener('input', function(e) {
+document.getElementById('letter-input').addEventListener('input', async function(e) {
     const letter = e.target.value.trim();
     if (letter) {
-        submitLetter();
+        await submitLetter();
     }
 });
 
-// סיום המשחק
 function endGame(reason) {
     document.getElementById('game-over').style.display = 'block';
     const gameOverText = document.getElementById('game-over-text');
     
-    // הצגת המקומות שהיו בפועל במשחק
     const usedPlacesList = Array.from(usedPlaces)
         .map(place => convertToDisplayFormat(place))
         .join(', ');
@@ -1397,13 +1514,13 @@ function endGame(reason) {
     const currentWord = currentLetters.map(l => l.letter).join('');
     
     let message = `המקומות שהיו במשחק: ${usedPlacesList}<br><br>`;
+    message += `הניקוד הסופי שלך: ${score}<br><br>`;
     
-    if (reason === "invalid_letter") {
+if (reason === "invalid_letter") {
         message += `האות האחרונה שהקלדת לא מתאימה.<br>`;
         
-        // הצגת האפשרויות הרלוונטיות בהתאם למצב
-        if (specialPlaces.includes(currentWord) && gamePlaces.includes(currentWord)) {
-            const longerPlaces = gamePlaces.filter(place => 
+        if (computerCompletedShortPlace) {
+            const longPlaces = gamePlaces.filter(place => 
                 !usedPlaces.has(place) && 
                 place.startsWith(currentWord)
             ).map(convertToDisplayFormat);
@@ -1412,8 +1529,8 @@ function endGame(reason) {
                 !usedPlaces.has(place)
             ).map(convertToDisplayFormat);
             
-            if (longerPlaces.length > 0) {
-                message += `ניתן היה להמשיך ל: ${longerPlaces.join(', ')}<br>`;
+            if (longPlaces.length > 0) {
+                message += `ניתן היה להמשיך ל: ${longPlaces.join(', ')}<br>`;
             }
             if (newPlaces.length > 0) {
                 message += `או להתחיל מקום חדש`;
@@ -1434,15 +1551,27 @@ function endGame(reason) {
     
     gameOverText.innerHTML = message;
     document.getElementById('letter-input').disabled = true;
+    
+    // בדיקה אם התוצאה טובה מספיק לטבלת השיאים
+    getHighScores().then(highScores => {
+        if (highScores.length < 10 || score > highScores[highScores.length - 1].score) {
+            document.getElementById('name-input-container').style.display = 'block';
+        }
+    });
 }
 
-// התחלת משחק חדש
 function startNewGame() {
     document.getElementById('game-over').style.display = 'none';
     document.getElementById('letter-input').disabled = false;
     document.getElementById('letters').innerHTML = '';
+    document.getElementById('name-input-container').style.display = 'none';
+    document.getElementById('name-input').value = '';
     initGame();
 }
 
-// התחלת המשחק
-initGame();
+// איתחול המשחק והמקלדת הוירטואלית בטעינת העמוד
+document.addEventListener('DOMContentLoaded', function() {
+    createVirtualKeyboard();
+    updateHighScoresDisplay();
+    initGame();
+});

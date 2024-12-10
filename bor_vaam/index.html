@@ -128,25 +128,26 @@
             min-width: 45px;
             height: 55px;
             padding: 0;
-            background-color: white;
-            border: 2px solid var(--border-color);
+            background-color: var(--secondary-color);
+            border: 3px solid #52c161;
             border-radius: 12px;
             font-family: 'Rubik', sans-serif;
             font-size: 24px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
-            color: var(--text-color);
+            color: white;
             box-shadow: 0 4px 8px var(--shadow-color);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 4px;
         }
 
         .key:hover {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: #52c161;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px var(--shadow-color);
         }
 
         .key:active {
@@ -271,7 +272,26 @@
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
         }
 
+#virtual-keyboard {
+            max-width: 600px;
+            margin: 25px auto;
+            padding: 15px;
+            background: transparent;
+            border-radius: 15px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            padding: 0 5px;
+        }
+
         @media (max-width: 768px) {
+            #letter-input {
+                display: none !important;
+            }
             #game-container {
                 margin: 10px;
                 padding: 15px;
@@ -286,9 +306,10 @@
             }
 
             .key {
-                min-width: 40px;
-                height: 65px;
-                font-size: 28px;
+                min-width: 42px;
+                height: 58px;
+                font-size: 26px;
+                margin: 2px;
             }
 
             .keyboard-row {

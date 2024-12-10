@@ -7,87 +7,79 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #63d471;
-            --error-color: #ff6b6b;
-            --background-color: #f5f7fa;
+            --primary-color: #0066cc;
+            --secondary-color: #4CAF50;
+            --error-color: #f44336;
+            --background-color: #f0f8ff;
             --card-background: white;
-            --border-color: #e1e8ed;
-            --text-color: #2c3e50;
-            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: #ddd;
         }
 
         body {
             font-family: 'Rubik', sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: var(--background-color);
             direction: rtl;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: var(--text-color);
-            line-height: 1.6;
         }
 
         #game-container {
-            max-width: 1000px;
-            margin: 20px auto;
+            max-width: 800px;
+            margin: 0 auto;
             background-color: var(--card-background);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px var(--shadow-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             flex-grow: 1;
+            border: 2px solid var(--border-color);
         }
 
         h1 {
             color: var(--primary-color);
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px var(--shadow-color);
+            font-size: 2rem;
         }
 
         #letters {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
-            margin: 25px 0;
-            padding: 20px;
+            margin: 20px 0;
+            padding: 15px;
             background-color: #f8f9fa;
-            border-radius: 15px;
-            min-height: 80px;
-            border: 2px solid var(--border-color);
-            box-shadow: inset 0 2px 5px var(--shadow-color);
+            border-radius: 8px;
+            min-height: 60px;
+            border: 1px solid var(--border-color);
         }
 
         #letters span {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            font-size: 32px;
+            display: inline-block;
+            width: 45px;
+            height: 45px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 24px;
             font-weight: bold;
-            border: 3px solid;
+            border: 2px solid;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px var(--shadow-color);
         }
 
         #letters span.player {
             background-color: var(--secondary-color);
             color: white;
-            border-color: #52c161;
-            transform: scale(1.05);
+            border-color: #45a049;
         }
 
         #letters span.computer {
             background-color: var(--error-color);
             color: white;
-            border-color: #ff5252;
-            transform: scale(1.05);
+            border-color: #d32f2f;
         }
 
         #input-section {
@@ -96,287 +88,198 @@
         }
 
         #letter-input {
-            font-size: 24px;
-            padding: 15px;
-            width: 80px;
+            font-size: 20px;
+            padding: 10px;
+            width: 50px;
             text-align: center;
             border: 2px solid var(--primary-color);
-            border-radius: 12px;
-            margin: 10px;
+            border-radius: 5px;
             font-family: 'Rubik', sans-serif;
         }
 
         #virtual-keyboard {
+            display: none;
             max-width: 600px;
-            margin: 25px auto;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px var(--shadow-color);
+            margin: 20px auto;
+            text-align: center;
         }
 
         .keyboard-row {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            padding: 0 10px;
+            gap: 5px;
+            margin-bottom: 5px;
         }
 
-        .key {
-            flex: 1;
-            min-width: 45px;
-            height: 55px;
-            padding: 0;
-            background-color: var(--secondary-color);
-            border: 3px solid #52c161;
-            border-radius: 12px;
-            font-family: 'Rubik', sans-serif;
+       .key {
+    padding: 15px 20px;
+    background-color: #e9ecef;
+    border: 2px solid #666;  /* מסגרת כהה יותר */
+    border-radius: 5px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;            /* צבע טקסט כהה */
+    font-weight: bold;      /* טקסט מודגש */
+    min-width: 40px;        /* רוחב מינימלי */
+    margin: 2px;            /* מרווח בין הכפתורים */
+}
+
+.key:hover {
+    background-color: #dee2e6;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.key:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+        #score {
+            text-align: center;
             font-size: 24px;
+            color: var(--primary-color);
+            margin: 20px 0;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: white;
-            box-shadow: 0 4px 8px var(--shadow-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 4px;
-        }
-
-        .key:hover {
-            background-color: #52c161;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px var(--shadow-color);
-        }
-
-        .key:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px var(--shadow-color);
         }
 
         .instructions {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 15px;
+            text-align: right;
             margin: 20px 0;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            border: 2px solid var(--border-color);
-        }
-
-        #score {
-            text-align: center;
-            font-size: 32px;
-            color: var(--primary-color);
-            margin: 25px 0;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px var(--shadow-color);
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.5;
+            border: 1px solid var(--border-color);
         }
 
         #game-over {
             display: none;
             text-align: center;
-            margin: 25px 0;
-            padding: 25px;
-            background-color: #fff3f3;
-            border-radius: 15px;
-            color: #d63031;
-            border: 2px solid #ffb8b8;
-            box-shadow: 0 4px 15px var(--shadow-color);
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8d7da;
+            border-radius: 8px;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
         #high-scores {
-            margin-top: 30px;
-            padding: 25px;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px var(--shadow-color);
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
         .high-score-entry {
             display: grid;
-            grid-template-columns: 50px 2fr 1.5fr 1.5fr;
-            gap: 15px;
-            padding: 15px;
+            grid-template-columns: 40px 2fr 1fr 1fr;
+            gap: 10px;
+            padding: 12px;
             align-items: center;
             background-color: #fff;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            border: 2px solid var(--border-color);
-            transition: transform 0.2s ease;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            border: 1px solid var(--border-color);
         }
 
-        .high-score-entry:hover {
-            transform: translateX(-5px);
-            box-shadow: 2px 2px 10px var(--shadow-color);
+        .high-score-entry:nth-child(even) {
+            background-color: #f8f9fa;
         }
 
         .score-rank {
-            font-size: 24px;
             font-weight: bold;
             color: var(--primary-color);
         }
 
         .score-name {
-            font-size: 20px;
             font-weight: 500;
         }
 
-        .score-points {
-            font-size: 20px;
-            color: var(--secondary-color);
-            font-weight: bold;
-        }
-
         .score-date {
-            font-size: 16px;
             color: #666;
+            font-size: 0.9em;
         }
 
-        button {
-            font-size: 20px;
-            padding: 12px 25px;
-            margin: 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-family: 'Rubik', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--shadow-color);
-        }
-
-        button:hover {
-            background-color: #357abd;
-            transform: translateY(-2px);
-        }
-
-        button:active {
-            transform: translateY(1px);
-        }
-
-        #name-input {
-            font-size: 20px;
-            padding: 12px;
-            border: 2px solid var(--primary-color);
-            border-radius: 12px;
-            margin: 15px;
-            font-family: 'Rubik', sans-serif;
-            width: 200px;
-            transition: all 0.3s ease;
-        }
-
-        #name-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
-        }
-
-#virtual-keyboard {
-            max-width: 600px;
-            margin: 25px auto;
-            padding: 15px;
-            background: transparent;
-            border-radius: 15px;
-        }
-
-        .keyboard-row {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 8px;
-            padding: 0 5px;
+        .score-points {
+            color: var(--secondary-color);
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
             #letter-input {
-                display: none !important;
-            }
-            #game-container {
-                margin: 10px;
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 2rem;
+                display: none;
             }
 
             #virtual-keyboard {
-                margin: 15px -10px;
+                display: block;
             }
+        }
 
-            .key {
-                min-width: 42px;
-                height: 58px;
-                font-size: 26px;
-                margin: 2px;
-            }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Rubik', sans-serif;
+        }
 
-            .keyboard-row {
-                gap: 6px;
-                margin-bottom: 6px;
-            }
+        button:hover {
+            background-color: #0052a3;
+        }
 
-            #letters span {
-                width: 50px;
-                height: 50px;
-                font-size: 28px;
-            }
+        #name-input-container {
+            display: none;
+            margin: 20px 0;
+        }
 
-            .high-score-entry {
-                grid-template-columns: 40px 1.5fr 1fr 1fr;
-                gap: 10px;
-                padding: 12px;
-            }
-
-            .score-rank {
-                font-size: 20px;
-            }
-
-            .score-name {
-                font-size: 16px;
-            }
-
-            .score-points {
-                font-size: 16px;
-            }
-
-            .score-date {
-                font-size: 14px;
-            }
+        #name-input {
+            font-size: 18px;
+            padding: 10px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: 'Rubik', sans-serif;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <h1>🏠 בור ועם הארץ 🗺️</h1>
+        <h1>בור ועם הארץ בידיעת הארץ</h1>
         <div class="instructions">
-            <p>בואו נבדוק כמה אתם מכירים את ישראל! 🇮🇱</p>
-            <p>המחשב נותן אות ראשונה של מקום בארץ, ואתם צריכים להמשיך אות אחר אות.</p>
-            <p>כשמסתיים שם של מקום - ממשיכים למקום הבא אוטומטית. שימו לב - אין רווחים ואין אותיות סופיות!</p>
-            <p>💪 יאללה, צאו לדרך!</p>
+            <p>אז איך אתם בידיעת הארץ? מצאו כמה שיותר שמות מקומות בארץ ישראל!</p>
+            <p>המשחק הולך כך: המחשב נותן אות ראשונה של אחד המקומות בארץ, אתם צריכים להקליד אות שממשיכה את שם היישוב, המחשב נותן אות נוספת, וכך ממשיכים וממשיכים.</p>
+            <p>כאשר מסתיים שם יישוב - עוברים מיד למקום הבא, בלי הודעה כלשהי. במשחק אין רווחים ואין אותיות סופיות. בהצלחה, צאו לדרך!</p>
+            
         </div>
         <div id="score">ניקוד: 0</div>
         <div id="letters"></div>
         <div id="input-section">
             <input type="text" id="letter-input" maxlength="1" placeholder="אות" dir="rtl">
         </div>
-        <div id="virtual-keyboard"></div>
+        <div id="virtual-keyboard">
+            <!-- המקלדת הווירטואלית תיווצר על ידי JavaScript -->
+        </div>
         <div id="game-over">
             <p id="game-over-text"></p>
             <div id="name-input-container">
-                <input type="text" id="name-input" placeholder="השם שלך" maxlength="20">
-                <button onclick="saveScore()">שמור תוצאה 🏆</button>
+                <input type="text" id="name-input" placeholder="הכניסו את שמכם" maxlength="20">
+                <button onclick="saveScore()">שמירת תוצאה</button>
             </div>
-            <button onclick="startNewGame()">משחק חדש 🎮</button>
+            <button onclick="startNewGame()">משחק חדש</button>
         </div>
         <div id="high-scores">
-            <h2>🏆 טבלת שיאים</h2>
+            <h2>טבלת שיאים</h2>
             <div id="high-scores-list"></div>
         </div>
     </div>
-
-    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
@@ -399,7 +302,7 @@
         const database = getDatabase(app);
         const analytics = getAnalytics(app);
 
-        // Make variables global
+        // הפוך את המשתנים לגלובליים
         window.firebaseApp = app;
         window.firebaseDB = database;
         window.dbRef = ref;
@@ -409,8 +312,6 @@
         window.dbLimitToLast = limitToLast;
         window.dbOnValue = onValue;
     </script>
-    
-    <!-- Game Script -->
     <script src="game.js"></script>
 </body>
 </html>

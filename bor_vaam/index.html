@@ -90,9 +90,24 @@
             transform: scale(1.05);
         }
 
+        #input-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #letter-input {
+            font-size: 24px;
+            padding: 15px;
+            width: 80px;
+            text-align: center;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            margin: 10px;
+            font-family: 'Rubik', sans-serif;
+        }
+
         #virtual-keyboard {
-            display: block;
-            max-width: 100%;
+            max-width: 600px;
             margin: 25px auto;
             padding: 15px;
             background: #f8f9fa;
@@ -146,11 +161,6 @@
             margin: 20px 0;
             box-shadow: 0 4px 15px var(--shadow-color);
             border: 2px solid var(--border-color);
-        }
-
-        .instructions p {
-            margin: 10px 0;
-            font-size: 18px;
         }
 
         #score {
@@ -271,14 +281,8 @@
                 font-size: 2rem;
             }
 
-            #letter-input {
-                display: block;
-            }
-
             #virtual-keyboard {
-                display: block;
                 margin: 15px -10px;
-                padding: 10px;
             }
 
             .key {
@@ -296,11 +300,6 @@
                 width: 50px;
                 height: 50px;
                 font-size: 28px;
-            }
-
-            .instructions {
-                font-size: 16px;
-                padding: 15px;
             }
 
             .high-score-entry {
@@ -323,28 +322,6 @@
 
             .score-date {
                 font-size: 14px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.75rem;
-            }
-
-            #virtual-keyboard {
-                margin: 10px -5px;
-            }
-
-            .key {
-                min-width: 35px;
-                height: 60px;
-                font-size: 24px;
-            }
-
-            #letters span {
-                width: 45px;
-                height: 45px;
-                font-size: 24px;
             }
         }
     </style>
@@ -377,5 +354,42 @@
             <div id="high-scores-list"></div>
         </div>
     </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
+        from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuBvkaPlk5c5TaRLjXlGJU8CzjPhp59vg",
+            authDomain: "boor-a77ba.firebaseapp.com",
+            databaseURL: "https://boor-a77ba-default-rtdb.firebaseio.com",
+            projectId: "boor-a77ba",
+            storageBucket: "boor-a77ba.firebasestorage.app",
+            messagingSenderId: "833492383808",
+            appId: "1:833492383808:web:e56b92acf690bf1a8dc7a5",
+            measurementId: "G-8W8FD8S6QS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const analytics = getAnalytics(app);
+
+        // Make variables global
+        window.firebaseApp = app;
+        window.firebaseDB = database;
+        window.dbRef = ref;
+        window.dbPush = push;
+        window.dbQuery = query;
+        window.dbOrderByChild = orderByChild;
+        window.dbLimitToLast = limitToLast;
+        window.dbOnValue = onValue;
+    </script>
+    
+    <!-- Game Script -->
+    <script src="game.js"></script>
 </body>
 </html>

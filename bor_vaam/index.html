@@ -229,12 +229,66 @@
 
         /* רספונסיביות */
         @media (max-width: 768px) {
+            /* הסתרת קלט רגיל והצגת מקלדת */
             #letter-input {
                 display: none;
             }
 
             #virtual-keyboard {
                 display: block;
+                padding: 25px 10px;
+                margin: 15px -15px;  /* הרחבה מעבר לגבולות המיכל */
+            }
+
+            /* הגדלת אותיות המשחק */
+            #letters span {
+                width: 55px;
+                height: 55px;
+                line-height: 55px;
+                font-size: 28px;
+            }
+
+            /* הגדלת אזור המשחק */
+            #game-container {
+                padding: 15px;
+                margin: 0;
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            /* הגדלת הניקוד */
+            #score {
+                font-size: 28px;
+                margin: 25px 0;
+            }
+
+            /* הגדלת כפתורי המקלדת */
+            .key {
+                padding: 25px 30px;
+                font-size: 24px;
+                min-width: 55px;
+            }
+
+            /* הגדלת הכותרת */
+            h1 {
+                font-size: 2.2rem;
+                margin: 15px 0 25px 0;
+            }
+
+            /* הקטנת padding של הדף */
+            body {
+                padding: 0;
+            }
+
+            /* הגדלת טקסט ההוראות */
+            .instructions {
+                font-size: 18px;
+                padding: 20px;
+            }
+
+            /* הגדלת טקסט בטבלת השיאים */
+            #high-scores {
+                font-size: 18px;
             }
         }
 

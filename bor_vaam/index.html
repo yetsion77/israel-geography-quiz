@@ -264,33 +264,41 @@
 
             /* התאמת המקלדת הווירטואלית */
             #virtual-keyboard {
-                margin: 10px 0;
-                padding: 10px 2px;
+                margin: 15px auto;
+                padding: 15px 10px;
                 width: 100%;
                 box-sizing: border-box;
                 max-width: 100%;
+                background-color: rgba(248, 249, 250, 0.95);
+                border-radius: 12px;
             }
 
             .keyboard-row {
-                gap: 3px;
-                padding: 0;
-                margin-bottom: 3px;
                 display: flex;
                 justify-content: center;
+                gap: 6px;
+                margin-bottom: 6px;
+                padding: 0;
                 flex-wrap: nowrap;
+                width: 100%;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .key {
-                padding: 8px;
-                font-size: 18px;
-                min-width: 24px;
-                margin: 1px;
-                max-width: 32px;
-                height: 40px;
+                padding: 12px;
+                font-size: 20px;
+                min-width: 32px;
+                margin: 0;
+                height: 45px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                flex: 0 1 auto;
+                flex: 1;
+                max-width: 45px;
+                border-radius: 8px;
+                box-shadow: 0 3px 0 #2d5a8e;
             }
 
             /* הגדלת הכותרת */
